@@ -60,7 +60,7 @@ def compute_behavior_time_series(behavior_csv_path):
     return df_all
 
 
-def combine_and_export_timeseries(df_behavior, df_matrix, df_tt, output_csv="final_time_series.csv"):
+def combine_and_export_timeseries(df_behavior, df_matrix, df_tt, output_csv="final_multivariatetimeseries.csv")
     df_combined = df_behavior.join(df_matrix, how="left").join(df_tt, how="left").fillna(0)
     df_combined.to_csv(output_csv)
     print(f"Final time series saved to {output_csv}")
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # Example usage
     XES_PATH = "BPI_Challenge_2019.xes"
     BEHAVIOR_CSV = "actor_behavior_results.csv"
-    OUTPUT = "final_time_series.csv"
+    OUTPUT = "final_multivariatetimeseries.csv"
 
     tt_series, resource_matrix = compute_tt_and_resource_matrix(XES_PATH)
     behavior_ts = compute_behavior_time_series(BEHAVIOR_CSV)
