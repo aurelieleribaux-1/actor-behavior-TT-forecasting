@@ -1,0 +1,80 @@
+# pipeline/dataset_pipeline.py
+
+import pandas as pd
+import pm4py
+
+def compute_tt_and_resource_matrix(xes_path):
+    print(f"Reading XES log: {xes_path}")
+    log = pm4py.read_xes(xes_path)
+    df = pm4py.convert_to_dataframe(log)
+    df["time:timestamp"] = pd.to_datetime(df["time:timestamp"], errors="coerce")
+    df["date"] = df["time:timestamp"].dt.date
+
+    # Compute Throughput Time (TT)
+    durations = df.groupby("case:concept:name").agg(
+        start=("time:timestamp", "min"),
+        end=("time:timestamp", "max")
+    )
+    durations["duration"] = (durations["end"] - durations["start"]).dt.total_seconds() / 3600
+    durations["start_day"] = durations["start"].dt.date
+    tt_series = durations.groupby("start_day")["duration"].mean().rename("TT")
+
+    # Daily resource matrix
+    daily_matrix = df.groupby(["date", "org:resource"]).size().unstack(fill_value=0)
+
+    return tt_series, daily_matrix
+
+
+def compute_behavior_time_series(behavior_csv_path):
+    df = pd.read_csv(behavior_csv_path)
+    df["timestamp_i"] = pd.to_datetime(df["timestamp_i"], errors='coerce')
+    df["timestamp_j"] = pd.to_datetime(df["timestamp_j"], errors='coerce')
+    df["date"] = df["timestamp_i"].dt.date
+
+    top_behaviors = df["behavior"].value_counts().head(4).index.tolist()
+    daily_count = df.groupby(["date", "behavior"]).size().unstack(fill_value=0)
+    daily_time = df.groupby(["date", "behavior"])["delta_t"].sum().unstack(fill_value=0)
+
+    all_series = []
+    for b in top_behaviors:
+        if b in daily_count.columns:
+            all_series.append(daily_count[b].rename(f"Count_{b}"))
+        if b in daily_time.columns:
+            all_series.append(daily_time[b].rename(f"Time_{b}_seconds"))
+
+    # Actor involvement
+    df_long = pd.melt(df, id_vars=["date"], value_vars=["actor_i", "actor_j"],
+                      var_name="actor_type", value_name="actor")
+    involvement = df_long.groupby(["date", "actor"]).size().groupby("date").sum()
+    involvement.name = "Resource_Involvement_Count"
+    all_series.append(involvement)
+
+    df_all = pd.concat(all_series, axis=1).sort_index().fillna(0)
+
+    # Convert seconds → minutes/hours
+    for col in df_all.columns:
+        if col.startswith("Time_") and col.endswith("_seconds"):
+            df_all[col.replace("_seconds", "_minutes")] = df_all[col] / 60
+            df_all[col.replace("_seconds", "_hours")] = df_all[col] / 3600
+
+    return df_all
+
+
+def combine_and_export_timeseries(df_behavior, df_matrix, df_tt, output_csv="final_time_series.csv"):
+    df_combined = df_behavior.join(df_matrix, how="left").join(df_tt, how="left").fillna(0)
+    df_combined.to_csv(output_csv)
+    print(f"Final time series saved to {output_csv}")
+    return df_combined
+
+
+if __name__ == "__main__":
+    # Example usage
+    XES_PATH = "BPI_Challenge_2019.xes"
+    BEHAVIOR_CSV = "actor_behavior_results.csv"
+    OUTPUT = "final_time_series.csv"
+
+    tt_series, resource_matrix = compute_tt_and_resource_matrix(XES_PATH)
+    behavior_ts = compute_behavior_time_series(BEHAVIOR_CSV)
+    final_ts = combine_and_export_timeseries(behavior_ts, resource_matrix, tt_series, OUTPUT)
+
+    print(" Time series pipeline complete!")
