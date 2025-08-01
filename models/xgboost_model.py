@@ -38,8 +38,10 @@ best_xgb_params = {
 
 
 # Load data from train/test split
-df_train_full = pd.read_csv("data/train.csv", index_col=0, parse_dates=True)
-df_test_final = pd.read_csv("data/test_final.csv", index_col=0, parse_dates=True)
+from utils.data_utils import load_train_test_split
+
+df_train_full, df_test_final = load_train_test_split("data/final_multivariatetimeseries.csv")
+
 
 # === Cross-Validation on training set ===
 tscv = TimeSeriesSplit(n_splits=5)
