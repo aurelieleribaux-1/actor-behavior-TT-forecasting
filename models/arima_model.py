@@ -25,8 +25,10 @@ from feature_engineering import feature_engineering
 # ---------------------------
 # Load data
 # ---------------------------
-df_train_full = pd.read_csv("data/train.csv", index_col=0, parse_dates=True)
-df_test_final = pd.read_csv("data/test_final.csv", index_col=0, parse_dates=True)
+d# Load data from train/test split
+from utils.data_utils import load_train_test_split
+
+df_train_full, df_test_final = load_train_test_split("data/final_multivariatetimeseries.csv")
 
 # ---------------------------
 #  Feature Engineering (Residual Target)
