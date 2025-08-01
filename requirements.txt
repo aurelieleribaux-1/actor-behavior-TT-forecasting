@@ -8,4 +8,6 @@ shap
 scipy
 numpy
 lightgbm
+tensorflow
+scipy
 
