@@ -60,7 +60,7 @@ def compute_behavior_time_series(behavior_csv_path):
     return df_all
 
 
-def combine_and_export_timeseries(df_behavior, df_matrix, df_tt, output_csv="final_multivariatetimeseries.csv")
+def combine_and_export_timeseries(df_behavior, df_matrix, df_tt, output_csv="final_multivariatetimeseries.csv"):
     df_combined = df_behavior.join(df_matrix, how="left").join(df_tt, how="left").fillna(0)
     df_combined.to_csv(output_csv)
     print(f"Final time series saved to {output_csv}")
