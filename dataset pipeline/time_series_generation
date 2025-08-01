@@ -73,8 +73,8 @@ def combine_and_export_timeseries(df_behavior, df_matrix, df_tt, output_csv="fin
 
 if __name__ == "__main__":
     # Example usage
-    XES_PATH = "BPI_Challenge_2017.xes"
-    BEHAVIOR_CSV = "actor_behavior_results.csv"
+    XES_PATH = "data/your_file.xes"
+    BEHAVIOR_CSV = "data/your_file.csv"
     OUTPUT = "data/final_multivariatetimeseries.csv"
 
     tt_series, resource_matrix = compute_tt_and_resource_matrix(XES_PATH)
