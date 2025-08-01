@@ -3,6 +3,10 @@
 import pandas as pd
 import pm4py
 
+import os
+os.makedirs("data", exist_ok=True)
+
+
 def compute_tt_and_resource_matrix(xes_path):
     print(f"Reading XES log: {xes_path}")
     log = pm4py.read_xes(xes_path)
@@ -69,9 +73,9 @@ def combine_and_export_timeseries(df_behavior, df_matrix, df_tt, output_csv="fin
 
 if __name__ == "__main__":
     # Example usage
-    XES_PATH = "BPI_Challenge_2019.xes"
+    XES_PATH = "BPI_Challenge_2017.xes"
     BEHAVIOR_CSV = "actor_behavior_results.csv"
-    OUTPUT = "final_multivariatetimeseries.csv"
+    OUTPUT = "data/final_multivariatetimeseries.csv"
 
     tt_series, resource_matrix = compute_tt_and_resource_matrix(XES_PATH)
     behavior_ts = compute_behavior_time_series(BEHAVIOR_CSV)
