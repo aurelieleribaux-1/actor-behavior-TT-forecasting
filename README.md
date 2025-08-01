@@ -37,11 +37,16 @@ Before training any models, you must generate the final multivariate time series
 - Actor behavior frequencies and durations
 - Resource participation
 
-Run the following script:
+First, place your input files in the data/ folder:
+1.The original event log (your_file.xes)
+
+2.The actor behavior file (your_file.csv) generated via: [Linking Actor Behavior to Process Performance Over Time](https://arxiv.org/abs/2507.23037)
+
+The, run the following script:
 
 python dataset pipeline/time_series_generation.py
 
-This will automatically output: data/final_multivariatetimeseries.csv
+This will automatically generate the multivariate time series: data/final_multivariatetimeseries.csv
 
 All model scripts automatically load the final time series and split it using a shared utility:
 
