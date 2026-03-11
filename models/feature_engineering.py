@@ -10,7 +10,7 @@ def feature_engineering(df, tt_lags=range(1, 4), actor_lags=range(1, 21), rollin
         df_model = df_model.iloc[:-1]
 
     if residual_target:
-        df_model['target'] = df_model['TT'].diff().rolling(window=3).mean().shift(1)
+        df_model['target'] = df_model['TT'].diff().rolling(window=3).mean().shift(-1)
     else:
         df_model['target'] =df_model['TT'].shift(-1)
 
